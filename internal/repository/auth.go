@@ -12,7 +12,6 @@ type Auth struct {
 func newAuthRepo(db *sql.DB) *Auth {
 	return &Auth{db: db}
 }
-
 func (r *Auth) CreateUser(user models.Register) error {
 
 	query := `INSERT INTO users(username,email,password,role) VALUES($1,$2,$3,$4)`
@@ -23,6 +22,18 @@ func (r *Auth) CreateUser(user models.Register) error {
 	}
 
 	return nil
+}
+
+func (r *Auth) GetUserById(id int) (models.User, error) {
+	var user models.User
+	query := `SELECT * FROM users WHERE id=$1`
+
+	row := r.db.QueryRow(query, id)
+	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
 }
 
 func (r *Auth) SelectUser(user models.Login) (models.User, error) {
