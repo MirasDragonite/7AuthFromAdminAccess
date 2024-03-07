@@ -16,14 +16,16 @@ func newProductRepo(db *sql.DB) *Product {
 
 func (r *Product) GetProduct(id int) (int, error) {
 	var result int
-	query := `SELECT id WHERE id=$1`
+	query := `SELECT id FROM products WHERE id=$1`
 
 	row := r.db.QueryRow(query, id)
 
 	err := row.Scan(&result)
 	if err != nil {
+
 		return 0, err
 	}
+
 	return result, nil
 }
 

@@ -14,7 +14,7 @@ func newAuthRepo(db *sql.DB) *Auth {
 }
 func (r *Auth) CreateUser(user models.Register) error {
 
-	query := `INSERT INTO users(username,email,password,role) VALUES($1,$2,$3,$4)`
+	query := `INSERT INTO users(username,email,hash_password,role) VALUES($1,$2,$3,$4)`
 
 	_, err := r.db.Exec(query, &user.Username, &user.Email, &user.Password, "user")
 	if err != nil {
@@ -40,9 +40,9 @@ func (r *Auth) SelectUser(user models.Login) (models.User, error) {
 
 	var result models.User
 
-	query := `SELECT * FROM users WHERE email=$1 AND password=$2`
+	query := `SELECT * FROM users WHERE email=$1 `
 
-	row := r.db.QueryRow(query, &user.Email, &user.Password)
+	row := r.db.QueryRow(query, &user.Email)
 
 	err := row.Scan(&result.ID, &result.Username, &result.Email, &result.Password, &result.Role)
 	if err != nil {

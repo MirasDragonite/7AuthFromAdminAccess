@@ -2,6 +2,7 @@ package services
 
 import (
 	"database/sql"
+	"errors"
 	"miras/internal/models"
 	"miras/internal/repository"
 	"net/http"
@@ -20,6 +21,9 @@ func newAuthService(repo *repository.Repository) *Auth {
 }
 func (s *Auth) CreateUser(user models.Register) error {
 
+	if user.Password != user.Repassword {
+		return errors.New("Passwords don't match")
+	}
 	hashPassword, err := HashPassword(user.Password)
 	if err != nil {
 		return err
@@ -34,7 +38,9 @@ func (s *Auth) LoginToSystem(login models.Login) (http.Cookie, error) {
 	if err != nil {
 		return http.Cookie{}, err
 	}
-
+	if !CheckPasswordHash(login.Password, user.Password) {
+		return http.Cookie{}, errors.New("wrong password")
+	}
 	cookie := http.Cookie{
 		Path:     "/",
 		HttpOnly: true,
@@ -50,7 +56,7 @@ func (s *Auth) LoginToSystem(login models.Login) (http.Cookie, error) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 
-			session.ID = int(user.ID)
+			session.UserID = int(user.ID)
 			session.Token = newToken
 			session.ExpiredDate = newTime.Format("2006-01-02 15:04:05")
 			cookie.Value = newToken
