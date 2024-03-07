@@ -1,6 +1,6 @@
 ## 7AuthFromAdminAccess
 
-* `mkabyken`
+* [mkabyken](https://t.me/mirasKabykenov)
 
 
 ### Description:
